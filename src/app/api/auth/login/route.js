@@ -1,4 +1,4 @@
-import corsHeaders from "@/lib/cors";
+import { getCorsHeaders } from "@/lib/cors";
 import { getClientPromise } from "@/lib/mongodb";
 import { errorResponse } from "@/lib/utils";
 import bcrypt from "bcrypt";
@@ -11,11 +11,12 @@ const adminPass = process.env.ADMIN_PASS;
 const DB_NAME = process.env.DB_NAME;
 
 export async function POST(req) {
+  const origin = req.headers.get("origin");
   const data = await req.json();
   const { email, password } = data;
 
   if (!email || !password) {
-    return errorResponse("Missing email or password", 400);
+    return errorResponse("Missing email or password", 400, origin);
   }
 
   const admin = checkAdmin(email, password);
@@ -30,7 +31,7 @@ export async function POST(req) {
       },
       {
         status: 200,
-        headers: corsHeaders,
+        headers: getCorsHeaders(origin),
       }
     );
 
@@ -44,7 +45,7 @@ export async function POST(req) {
 
     return response;
   } else {
-    return errorResponse("Invalid email or password", 401);
+    return errorResponse("Invalid email or password", 401, origin);
   }
 }
 
@@ -97,9 +98,9 @@ function getJwtToken(user) {
 
   return token;
 }
-export async function OPTIONS() {
+export async function OPTIONS(request) {
   return new Response(null, {
     status: 204,
-    headers: corsHeaders,
+    headers: getCorsHeaders(request.headers.get("origin")),
   });
 }

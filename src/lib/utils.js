@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import corsHeaders from "./cors";
+import { getCorsHeaders } from "./cors";
 
-export function errorResponse(message, status = 500) {
+export function errorResponse(message, status = 500, origin) {
   return NextResponse.json(
     { message },
     {
       status,
-      headers: corsHeaders,
+      headers: getCorsHeaders(origin),
     }
   );
 }
