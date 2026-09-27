@@ -67,20 +67,20 @@ async function checkUser(email, password) {
   try {
     const client = await getClientPromise();
     const db = client.db(DB_NAME);
-
-    const user = await db.collection("user").findOne({ email });
+    
+    const user = await db.collection("users").findOne({ email });
+    
 
     if (!user) return false;
-
     const check = await bcrypt.compare(password, user.password);
-
+    
     if (!check) {
       return false;
     }
 
     return user;
   } catch (error) {
-    console.log("exception", error.toString());
+    console.log("LOGIN ERROR:", error);
     return false;
   }
 }
